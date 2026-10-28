@@ -1,0 +1,19 @@
+{
+  "format": "modbus-slave-emulator",
+  "version": 1,
+  "transport": "tcp",
+  "tcp": {"host": "127.0.0.1", "port": 1502},
+  "devices": [
+    {
+      "unit_id": 1,
+      "name": "Device 1",
+      "enabled": true,
+      "blocks": [
+        {"area": "coils", "start": 0, "count": 8, "name": "Outputs"},
+        {"area": "discrete_inputs", "start": 0, "count": 8, "name": "Inputs"},
+        {"area": "holding_registers", "start": 0, "count": 4, "name": "Setpoints", "values": [10, 20, 30, 40]},
+        {"area": "input_registers", "start": 0, "count": 2, "name": "Measurements", "values": [100, 200]}
+      ]
+    }
+  ]
+}
