@@ -47,7 +47,7 @@ from .config import (
     SerialSettings,
     TcpSettings,
 )
-from . import __version__
+from . import APPLICATION_NAME, __version__
 from .dialogs import BlockDialog
 from .models import RegisterTableModel
 from .register_bank import RegisterBank
@@ -67,7 +67,7 @@ class EmulatorMainWindow(QMainWindow):
         self._updating_device_list = False
         self._request_count = 0
 
-        self.setWindowTitle("Modbus Slave Emulator")
+        self.setWindowTitle(APPLICATION_NAME)
         self.resize(1280, 820)
         self.setMinimumSize(980, 650)
         self._build_ui()
@@ -959,7 +959,7 @@ class EmulatorMainWindow(QMainWindow):
             self,
             "O emulatorze",
             (
-                f"<b>Modbus Slave Emulator {__version__}</b><br><br>"
+                f"<b>{APPLICATION_NAME} {__version__}</b><br><br>"
                 "Wielourządzeniowy serwer Modbus RTU/TCP dla Unit ID 1–247.<br>"
                 "Własne zakresy coils, discrete inputs, holding registers i input registers."
             ),

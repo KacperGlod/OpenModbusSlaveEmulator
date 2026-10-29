@@ -1,4 +1,6 @@
-# Zasady pracy nad Modbus Slave Emulator
+# Zasady pracy nad Open Modbus Slave Emulator
+
+Nazwa repozytorium: `OpenModbusSlaveEmulator`.
 
 Instrukcje dotyczą całego repozytorium. Celem jest czytelny, uniwersalny emulator
 Modbus RTU/TCP, który łatwo rozwijać i którego obsługa jest zrozumiała.
@@ -75,7 +77,7 @@ Polecenia PowerShell z katalogu repozytorium:
 ```powershell
 .\.venv\Scripts\python.exe run_emulator.py
 .\.venv\Scripts\python.exe -m unittest discover -s tests -v
-.\.venv\Scripts\python.exe -m PyInstaller --noconfirm Modbus-Slave-Emulator.spec
+.\.venv\Scripts\python.exe -m PyInstaller --noconfirm OpenModbusSlaveEmulator.spec
 ```
 
 ## Komunikacja i commity — obowiązkowo

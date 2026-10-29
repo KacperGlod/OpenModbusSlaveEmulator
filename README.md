@@ -1,11 +1,14 @@
-# Modbus Slave Emulator
+# Open Modbus Slave Emulator
+
+Nazwa repozytorium: `OpenModbusSlaveEmulator`.
 
 Uniwersalny emulator wielu urządzeń Modbus RTU/TCP z interfejsem PyQt6.
 Mapa danych powstaje w konfiguracji użytkownika. Nowa konfiguracja jest pusta.
 
 ## Uruchomienie
 
-Wymagany Python 3.10 lub nowszy. Polecenia Windows PowerShell, z katalogu projektu:
+Wymagany Python 3.10 lub nowszy. Polecenia Windows PowerShell, z katalogu
+projektu `OpenModbusSlaveEmulator`:
 
 ```powershell
 python -m venv .venv
@@ -76,6 +79,7 @@ Wartości są zapisywane również przy zamknięciu okna. Domyślny lokalny
 wykonywalnego; dla uruchomienia ze źródeł — w katalogu projektu.
 
 Plik ma identyfikator `"format": "modbus-slave-emulator"` oraz `"version": 1`.
+Identyfikator formatu pozostaje stały, aby zachować zgodność istniejących plików.
 Inne formaty i nieznane pola są odrzucane. Błąd otwarcia konfiguracji przy starcie
 kończy aplikację z komunikatem, bez nadpisywania pliku.
 Neutralny przykład czterech obszarów można otworzyć przez:
@@ -94,13 +98,13 @@ Pominięte lub puste `values` oznacza zera; podana lista musi mieć długość `
 ```powershell
 .\.venv\Scripts\python.exe -m unittest discover -s tests -v
 .\.venv\Scripts\python.exe -m pip install -r requirements-build.txt
-.\.venv\Scripts\python.exe -m PyInstaller --noconfirm Modbus-Slave-Emulator.spec
+.\.venv\Scripts\python.exe -m PyInstaller --noconfirm OpenModbusSlaveEmulator.spec
 ```
 
 Testy obejmują walidację, GUI, odczyty i zapisy wszystkich obszarów przez TCP,
 niezależność 50 urządzeń, granice adresów, RO i luki w mapie.
 RTU wymaga osobnego sprawdzenia z portem fizycznym lub wirtualną parą portów.
-Gotowy plik powstaje w `dist/Modbus-Slave-Emulator.exe`.
+Gotowy plik powstaje w `dist/OpenModbusSlaveEmulator.exe`.
 Pakiet nie dołącza plików konfiguracji ani dodatkowych zasobów aplikacyjnych.
 Specyfikacja budowania na Windows ogranicza wyszukiwanie bibliotek DLL do Qt,
 Pythona i Windows, aby biblioteki innych aplikacji w PATH nie trafiły do paczki.

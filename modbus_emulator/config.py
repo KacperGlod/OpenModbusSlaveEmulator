@@ -7,6 +7,7 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
+from . import APPLICATION_NAME
 from .register_map import DataArea
 
 CONFIG_FORMAT = "modbus-slave-emulator"
@@ -152,7 +153,7 @@ class EmulatorSettings:
         try:
             _object(data, {"format", "version", "transport", "serial", "tcp", "devices"}, "Konfiguracja")
             if data.get("format") != CONFIG_FORMAT:
-                raise ConfigurationError("Plik nie jest konfiguracją Modbus Slave Emulator")
+                raise ConfigurationError(f"Plik nie jest konfiguracją {APPLICATION_NAME}")
             serial = SerialSettings(**_object(data.get("serial", {}), set(SerialSettings.__dataclass_fields__), "RTU"))
             tcp = TcpSettings(**_object(data.get("tcp", {}), set(TcpSettings.__dataclass_fields__), "TCP"))
             raw_devices = data.get("devices", [])

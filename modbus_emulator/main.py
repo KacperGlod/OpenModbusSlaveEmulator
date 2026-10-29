@@ -6,7 +6,7 @@ from pathlib import Path
 
 from PyQt6.QtWidgets import QApplication, QMessageBox
 
-from . import __version__
+from . import APPLICATION_NAME, __version__
 from .config import ConfigurationError, EmulatorSettings
 from .gui import EmulatorMainWindow
 
@@ -18,16 +18,16 @@ def default_config_path() -> Path:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Uniwersalny emulator Modbus Slave RTU/TCP")
+    parser = argparse.ArgumentParser(description=f"{APPLICATION_NAME} — emulator RTU/TCP")
     parser.add_argument("--config", type=Path, default=default_config_path(), help="Ścieżka konfiguracji JSON")
     parser.add_argument("--devices", type=int, default=0, help="Liczba pustych urządzeń przy pierwszym uruchomieniu (0..247)")
     arguments = parser.parse_args()
     if not 0 <= arguments.devices <= 247:
         parser.error("--devices musi należeć do zakresu 0..247")
     application = QApplication(sys.argv)
-    application.setApplicationName("Modbus Slave Emulator")
+    application.setApplicationName(APPLICATION_NAME)
     application.setApplicationVersion(__version__)
-    application.setOrganizationName("Modbus Slave Emulator")
+    application.setOrganizationName(APPLICATION_NAME)
     try:
         settings = EmulatorSettings.load(arguments.config) if arguments.config.exists() else EmulatorSettings.default(arguments.devices)
     except ConfigurationError as error:
