@@ -4,6 +4,7 @@ import argparse
 import sys
 from pathlib import Path
 
+from PyQt6.QtCore import QLibraryInfo, QTranslator
 from PyQt6.QtWidgets import QApplication, QMessageBox
 
 from . import APPLICATION_NAME, __version__
@@ -27,6 +28,9 @@ def main() -> int:
     application = QApplication(sys.argv)
     # Unikamy migotania natywnych animacji ramek Windows przy ułamkowym skalowaniu DPI.
     application.setStyle("Fusion")
+    qt_translator = QTranslator()
+    if qt_translator.load("qtbase_pl", QLibraryInfo.path(QLibraryInfo.LibraryPath.TranslationsPath)):
+        application.installTranslator(qt_translator)
     application.setApplicationName(APPLICATION_NAME)
     application.setApplicationVersion(__version__)
     application.setOrganizationName(APPLICATION_NAME)
