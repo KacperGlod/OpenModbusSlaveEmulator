@@ -25,6 +25,8 @@ def main() -> int:
     if not 0 <= arguments.devices <= 247:
         parser.error("--devices musi należeć do zakresu 0..247")
     application = QApplication(sys.argv)
+    # Unikamy migotania natywnych animacji ramek Windows przy ułamkowym skalowaniu DPI.
+    application.setStyle("Fusion")
     application.setApplicationName(APPLICATION_NAME)
     application.setApplicationVersion(__version__)
     application.setOrganizationName(APPLICATION_NAME)

@@ -4,6 +4,8 @@ Nazwa repozytorium: `OpenModbusSlaveEmulator`.
 
 Uniwersalny emulator wielu urządzeń Modbus RTU/TCP z interfejsem PyQt6.
 Mapa danych powstaje w konfiguracji użytkownika. Nowa konfiguracja jest pusta.
+Interfejs korzysta ze stylu Qt Fusion, aby pola formularzy miały stabilne
+obramowania również przy skalowaniu ekranu, np. 125% lub 150%.
 
 ## Uruchomienie
 
