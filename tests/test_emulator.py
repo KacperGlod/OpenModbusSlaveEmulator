@@ -277,7 +277,7 @@ class GuiTests(unittest.TestCase):
 
     def test_add_device_range_creates_no_implicit_addresses(self):
         window = self.make_window()
-        with patch("modbus_emulator.gui.QInputDialog.getText", return_value=("7-9", True)):
+        with patch("modbus_emulator.gui.get_text_input", return_value=("7-9", True)):
             window._add_devices()
         self.assertEqual(sorted(window.devices), [7, 8, 9])
         self.assertEqual(window.register_model.rowCount(), 0)

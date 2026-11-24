@@ -21,7 +21,6 @@ from PyQt6.QtWidgets import (
     QGroupBox,
     QHBoxLayout,
     QHeaderView,
-    QInputDialog,
     QLabel,
     QLineEdit,
     QListWidget,
@@ -48,7 +47,7 @@ from .config import (
     TcpSettings,
 )
 from . import APPLICATION_NAME, __version__
-from .dialogs import BlockDialog
+from .dialogs import BlockDialog, get_text_input
 from .models import RegisterTableModel
 from .register_bank import RegisterBank
 from .register_map import DataArea, READ_FUNCTION_CODES
@@ -586,7 +585,7 @@ class EmulatorMainWindow(QMainWindow):
         suggested = 1
         while suggested in self.devices and suggested <= 247:
             suggested += 1
-        text, accepted = QInputDialog.getText(
+        text, accepted = get_text_input(
             self,
             "Dodawanie urządzeń",
             "Podaj Unit ID albo zakres, np. 11-50:",
@@ -624,7 +623,7 @@ class EmulatorMainWindow(QMainWindow):
         device = self._selected_device()
         if device is None or self.server_expected_running:
             return
-        name, accepted = QInputDialog.getText(
+        name, accepted = get_text_input(
             self,
             "Nazwa urządzenia",
             f"Nazwa dla Unit ID {device.unit_id}:",

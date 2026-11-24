@@ -1,12 +1,40 @@
-"""Edytor zakresu adresowego użytkownika."""
+"""Formularze edycji urządzeń i zakresów adresowych użytkownika."""
 
 from PyQt6.QtWidgets import (
-    QCheckBox, QComboBox, QDialog, QDialogButtonBox, QFormLayout,
-    QLabel, QLineEdit, QMessageBox, QSpinBox,
+    QCheckBox, QComboBox, QDialog, QFormLayout, QHBoxLayout, QInputDialog,
+    QLabel, QLineEdit, QMessageBox, QPushButton, QSpinBox, QWidget,
 )
 
 from .config import ConfigurationError, DataBlockSettings
 from .register_map import DataArea, parse_value
+
+
+def create_dialog_buttons(dialog: QDialog) -> QWidget:
+    buttons = QWidget(dialog)
+    layout = QHBoxLayout(buttons)
+    layout.setContentsMargins(0, 0, 0, 0)
+    ok_button = QPushButton("OK", buttons)
+    ok_button.setDefault(True)
+    ok_button.clicked.connect(dialog.accept)
+    cancel_button = QPushButton("Anuluj", buttons)
+    cancel_button.clicked.connect(dialog.reject)
+    layout.addWidget(ok_button)
+    layout.addStretch()
+    layout.addWidget(cancel_button)
+    return buttons
+
+
+def get_text_input(parent, title: str, label: str, *, text: str = "") -> tuple[str, bool]:
+    dialog = QInputDialog(parent)
+    dialog.setWindowTitle(title)
+    dialog.setLabelText(label)
+    dialog.setTextValue(text)
+    dialog.setOption(QInputDialog.InputDialogOption.NoButtons)
+    dialog.layout().addWidget(create_dialog_buttons(dialog))
+    accepted = dialog.exec() == QDialog.DialogCode.Accepted
+    value = dialog.textValue() if accepted else ""
+    dialog.deleteLater()
+    return value, accepted
 
 
 class BlockDialog(QDialog):
@@ -39,10 +67,7 @@ class BlockDialog(QDialog):
         hint = QLabel("Adresy 0..65535, bez prefiksów 0xxxx/1xxxx/3xxxx/4xxxx.\nDane RO można zmieniać jako operator w tabeli.")
         hint.setWordWrap(True)
         layout.addRow(hint)
-        buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
-        buttons.accepted.connect(self.accept)
-        buttons.rejected.connect(self.reject)
-        layout.addRow(buttons)
+        layout.addRow(create_dialog_buttons(self))
         self.start_spin.valueChanged.connect(lambda start: self.count_spin.setMaximum(65536 - start))
         self.area_combo.currentIndexChanged.connect(self._area_changed)
         self.start_spin.setValue(block.start if block else 0)
