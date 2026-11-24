@@ -1,18 +1,13 @@
 # Open Modbus Slave Emulator
 
-Nazwa repozytorium: `OpenModbusSlaveEmulator`.
+A desktop application for emulating multiple Modbus RTU/TCP slave devices.
+Define your own devices, address ranges, and values without a predefined register map.
+New configurations start empty. The current user interface is in Polish.
 
-Uniwersalny emulator wielu urządzeń Modbus RTU/TCP z interfejsem PyQt6.
-Mapa danych powstaje w konfiguracji użytkownika. Nowa konfiguracja jest pusta.
-Interfejs korzysta ze stylu Qt Fusion, aby pola formularzy miały stabilne
-obramowania również przy skalowaniu ekranu, np. 125% lub 150%.
-Standardowe okna i przyciski Qt również korzystają z polskiego tłumaczenia.
-W formularzach przycisk **OK** znajduje się przy lewej krawędzi, a **Anuluj** przy prawej.
+## Getting started
 
-## Uruchomienie
-
-Wymagany Python 3.10 lub nowszy. Polecenia Windows PowerShell, z katalogu
-projektu `OpenModbusSlaveEmulator`:
+Requires Python 3.10 or later. Run these commands from the project directory
+in Windows PowerShell:
 
 ```powershell
 python -m venv .venv
@@ -20,95 +15,113 @@ python -m venv .venv
 .\.venv\Scripts\python.exe run_emulator.py
 ```
 
-Na Linux użyj `.venv/bin/python` zamiast `.venv\Scripts\python.exe`.
-Opcja `--devices 10` tworzy 10 pustych urządzeń przy pierwszym uruchomieniu.
-Opcja `--config ścieżka.json` wybiera osobny plik konfiguracji.
+On Linux, use `.venv/bin/python` instead of `.venv\Scripts\python.exe`.
 
-## Pierwsza konfiguracja
+Optional command-line arguments:
 
-1. Dodaj urządzenie lub zakres Unit ID, np. `1-10` (obsługiwane ID: 1–247).
-2. Wybierz urządzenie i kliknij **Dodaj zakres**.
-3. Wybierz obszar, adres początkowy PDU, liczbę adresów i opcjonalną nazwę.
-4. Dodaj kolejne zakresy, ustaw wartości w tabeli i wybierz parametry TCP lub RTU.
-5. Kliknij **Uruchom serwer**. Wartości można zmieniać podczas pracy.
+- `--devices 10` creates 10 devices with empty maps when the configuration file
+  does not yet exist. Supported counts: 0–247.
+- `--config path.json` selects a configuration file.
 
-Zaznacz wiersz w tabeli, aby edytować lub usunąć cały zakres zawierający ten adres.
-Kopiowanie mapy i wartości do wszystkich urządzeń zastępuje ich zakresy.
-Zmiana mapy i dostępności urządzeń wymaga zatrzymania serwera.
+## Setting up an emulator
 
-## Obszary i adresowanie
+1. Add a device or a range of Unit IDs, such as `1-10`. Supported IDs: 1–247.
+2. Select a device and add an address range.
+3. Choose the data area, starting PDU address, address count, and an optional name.
+4. Set values in the table and configure the TCP or RTU connection.
+5. Start the server. Values remain editable while it is running.
 
-| Obszar JSON | Funkcje | Dostęp klienta |
+Select a table row to edit or remove the range containing that address.
+You can also copy the selected device's map and values to all other devices;
+this replaces their existing ranges and values.
+Stop the server before changing address maps or enabling and disabling devices.
+
+## Data areas and addressing
+
+| JSON area | Function codes | Modbus client access |
 | --- | --- | --- |
-| `coils` | FC01, FC05, FC15 | odczyt/zapis 0 lub 1 |
-| `discrete_inputs` | FC02 | odczyt 0 lub 1 |
-| `holding_registers` | FC03, FC06, FC16, FC22, FC23 | odczyt/zapis 16 bit |
-| `input_registers` | FC04 | odczyt 16 bit |
+| `coils` | FC01, FC05, FC15 | Read/write, 0 or 1 |
+| `discrete_inputs` | FC02 | Read-only, 0 or 1 |
+| `holding_registers` | FC03, FC06, FC16, FC22, FC23 | Read/write, 16-bit |
+| `input_registers` | FC04 | Read-only, 16-bit |
 
-Adresy są surowymi adresami PDU **0..65535**. Adres 0 w konfiguracji oznacza
-adres 0 w żądaniu. Konwencjonalne numery typu 40001 należy przeliczyć po stronie
-klienta na właściwy obszar i adres PDU. Ten sam adres może występować niezależnie
-w każdym obszarze oraz w każdym urządzeniu.
+Addresses are raw PDU addresses in the range **0–65535**. Address 0 in the
+configuration is address 0 in a request. Convert conventional register numbers
+such as 40001 to the appropriate data area and PDU address in your client.
+Each device and data area has an independent address map.
 
-Istnieją wyłącznie adresy dodane przez użytkownika. Luki i żądania wychodzące
-poza zdefiniowany zakres zwracają wyjątek Illegal Data Address. Zakresy w tym
-samym obszarze nie mogą się nakładać; sąsiednie można odczytywać wspólnie.
+Only explicitly defined addresses are accessible. Requests that include gaps
+or undefined addresses return an Illegal Data Address exception. Ranges within
+the same device and data area cannot overlap; adjacent ranges can be read together.
 
-Zakres coils lub holding registers można dodatkowo oznaczyć jako RO.
-Operator w GUI może edytować również dane RO oraz obszary wejściowe.
-Rejestry przechowują wartości 0..65535; edytor przyjmuje decimal, `0xHEX`
-i liczby signed 16 (-32768..32767, zapisywane jako uzupełnienie do dwóch).
-Kolumna Signed 16 pokazuje interpretację tej samej wartości. Obsługiwane są
-surowe słowa 16 bit; wartości 32 bit, float i napisy można kodować w kolejnych
-rejestrach po stronie klienta. Emulator nie wykonuje automatycznych przeliczeń.
+Coils and holding registers can be marked read-only (RO) for Modbus clients.
+The GUI operator can still edit these values, as well as discrete inputs and
+input registers.
 
-## Transport
+Registers store values from 0 to 65535. The editor accepts decimal, hexadecimal
+(`0x1234`), and signed 16-bit values (-32768 to 32767, stored in two's complement).
+The Signed 16 column shows the signed interpretation. To represent 32-bit values,
+floating-point numbers, or strings, encode them across consecutive registers in
+your client. The emulator stores raw 16-bit words without automatic conversion.
 
-TCP domyślnie nasłuchuje na `127.0.0.1:1502`. Wszystkie urządzenia współdzielą
-jeden endpoint. W RTU współdzielą jeden port szeregowy; dostępne prędkości GUI:
-1200, 2400, 4800, 9600, 19200 i 38400 baud. Konfiguracja JSON może wskazać
-inną prędkość z zakresu 1..38400, zachowywaną przez GUI.
-Do połączenia dwóch aplikacji na jednym komputerze
-można użyć pary połączonych wirtualnych portów szeregowych.
-Urządzenia wyłączone i nieznane Unit ID nie odpowiadają. Broadcast jest wyłączony.
+## Connections and logging
 
-Log pokazuje żądania, odrzucone operacje i stan serwera. Licznik zlicza każde
-odebrane żądanie, również niepoprawne. Widok logu zachowuje ostatnie 2000 wierszy.
+TCP listens on `127.0.0.1:1502` by default. All devices share one TCP endpoint
+or, in RTU mode, one serial port.
 
-## Pliki konfiguracji
+The RTU interface offers 1200, 2400, 4800, 9600, 19200, and 38400 baud.
+Custom baud rates from 1 to 38400 can be set in JSON and are preserved by the GUI.
+A connected pair of virtual serial ports can be used to communicate between
+two applications on the same computer.
 
-Menu **Plik** umożliwia utworzenie nowej konfiguracji oraz otwieranie i zapis JSON.
-Wartości są zapisywane również przy zamknięciu okna. Domyślny lokalny
-`emulator.json` jest ignorowany przez Git. Dla EXE znajduje się obok pliku
-wykonywalnego; dla uruchomienia ze źródeł — w katalogu projektu.
+Disabled devices and unknown Unit IDs do not respond. Broadcast is disabled.
+The log displays requests, rejected operations, and server status. The request
+counter includes invalid requests, and the log view keeps the latest 2000 lines.
 
-Plik ma identyfikator `"format": "modbus-slave-emulator"` oraz `"version": 1`.
-Identyfikator formatu pozostaje stały, aby zachować zgodność istniejących plików.
-Inne formaty i nieznane pola są odrzucane. Błąd otwarcia konfiguracji przy starcie
-kończy aplikację z komunikatem, bez nadpisywania pliku.
-Neutralny przykład czterech obszarów można otworzyć przez:
+## Configuration files
+
+Use the file menu to create, open, save, or save a copy of a JSON configuration.
+Values are also saved when closing the application.
+
+The default file is `emulator.json`, stored in the project directory when running
+from source or next to the executable when using the Windows build.
+This local file is excluded from Git.
+
+Configuration files use `"format": "modbus-slave-emulator"` and `"version": 1`.
+Unsupported formats and unknown fields are rejected. An invalid configuration
+at startup displays an error and exits without overwriting the file.
+
+To open the example covering all four data areas:
 
 ```powershell
 .\.venv\Scripts\python.exe run_emulator.py --config emulator.example.json
 ```
 
-W takim przypadku zmiany zostaną zapisane do pliku przykładu; do własnej pracy
-użyj **Zapisz jako**. Każde urządzenie zawiera listę `blocks`. Zakres zawiera
-`area`, `start`, `count`, opcjonalne `name`, `read_only` i `values`.
-Pominięte lub puste `values` oznacza zera; podana lista musi mieć długość `count`.
+Use Save As before making changes to keep the example unchanged; otherwise,
+changes will be saved back to the example file.
 
-## Testy i EXE
+Each device contains a `blocks` list. Each block defines `area`, `start`, and
+`count`, with optional `name`, `read_only`, and `values` fields.
+Omitted or empty `values` initialize the range to zero. A nonempty list must
+contain exactly `count` values.
+
+## Tests
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest discover -s tests -v
+```
+
+Tests cover configuration validation, GUI behavior, TCP reads and writes for all
+data areas, isolation between 50 devices, address boundaries, read-only ranges,
+and gaps in address maps. RTU requires separate testing with a physical serial
+port or a connected pair of virtual ports.
+
+## Building a Windows executable
+
+```powershell
 .\.venv\Scripts\python.exe -m pip install -r requirements-build.txt
 .\.venv\Scripts\python.exe -m PyInstaller --noconfirm OpenModbusSlaveEmulator.spec
 ```
 
-Testy obejmują walidację, GUI, odczyty i zapisy wszystkich obszarów przez TCP,
-niezależność 50 urządzeń, granice adresów, RO i luki w mapie.
-RTU wymaga osobnego sprawdzenia z portem fizycznym lub wirtualną parą portów.
-Gotowy plik powstaje w `dist/OpenModbusSlaveEmulator.exe`.
-Pakiet nie dołącza plików konfiguracji ani dodatkowych zasobów aplikacyjnych.
-Specyfikacja budowania na Windows ogranicza wyszukiwanie bibliotek DLL do Qt,
-Pythona i Windows, aby biblioteki innych aplikacji w PATH nie trafiły do paczki.
+The executable is created at `dist/OpenModbusSlaveEmulator.exe` and runs without
+a separate Python installation. User configuration files are not bundled.
